@@ -1,3 +1,4 @@
 {
-  "mongoURI": "mongodb+srv://BethDay:LaNdisAve323@cluster0.qlffy.mongodb.net/devconnectordb?retryWrites=true&w=majority"
+  "mongoURI": "mongodb+srv://BethDay:LaNdisAve323@cluster0.qlffy.mongodb.net/devconnectordb?retryWrites=true&w=majority",
+  "jwtSecret": "mysecrettoken"
 }

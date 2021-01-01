@@ -1,12 +1,14 @@
 const express = require('express');
 const router = express.Router();
+const gravatar = require('gravatar');
+const bcrypt = require('bcryptjs');
+const jwt = require('jsonwebtoken');
+const config = require('config');
 const { check, validationResult } = require('express-validator/check');
 
 const User = require('../../models/Users');
 
-//@route POST api/users
-//@desc Register user
-// @access public
+//Create user
 router.post('/', [
   check('name', 'Name is required').not().isEmpty(),
   check('email', 'Please include a valid email').isEmail(),
@@ -21,26 +23,56 @@ router.post('/', [
     const { name, email, password } = req.body;
 
     try {
-      // See if user exists - make a query with mongoose
+      let user = await User.findOne({ email });
 
+      if (user) {
+        return res.status(400).json({ errors: [{ msg: 'User already exists' }] });
+      }
 
+      const avatar = gravatar.url(email, {
+        s: '200',
+        r: 'pg',
+        d: 'mm'
+      })
 
-      //Get user's gravatar
+      user = new User({
+        name,
+        email,
+        avatar,
+        password
+      });
 
-      //Encrypt password
+      //hash password
+      const salt = await bcrypt.genSalt(10);
 
-      //Return JSONwebtoken
-      res.send('User route');
+      user.password = await bcrypt.hash(password, salt);
 
+      //save user in database
+      await user.save();
+
+      //get the payload that includes the user id
+      const payload = {
+        user: {
+          id: user.id
+        }
+      }
+
+      //sign the token pass in the payload, secret, expiration and inside the callback get err or token
+      jwt.sign(
+        payload,
+        config.get('jwtSecret'),
+        { expiresIn: 36000 },
+        (err, token) => {
+          if (err) throw err;
+          res.json({ token });
+        }
+      );
     } catch (err) {
       console.error(err.message);
       res.status(500).send('Server error');
-
     }
-
-
-    res.send('User route')
-  });
+  }
+);
 
 
 module.exports = router;

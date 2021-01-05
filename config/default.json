@@ -1,5 +1,0 @@
-{
-  "mongoURI": "mongodb+srv://BethDay:LaNdisAve323@cluster0.qlffy.mongodb.net/devconnectordb?retryWrites=true&w=majority",
-  "jwtSecret": "mysecrettoken",
-  "githubToken": " ee9d3b77dee93246da5fd32ba5eb87acb100acbc"
-}
